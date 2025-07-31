@@ -1,3 +1,3 @@
 export default {
-  basePath: '/frames/weather'
+  basePath: '/frames/weather',
 };

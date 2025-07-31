@@ -1,91 +1,77 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { sdk } from '@farcaster/miniapp-sdk';
+import { useRouter } from 'next/navigation';
+import '@/app/styles/weather.css';
 
-type WeatherData = {
-  temp: string;
-  desc: string;
-  city: string;
-  country: string;
-};
-
-export default function WeatherMiniApp() {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const locRes = await fetch('https://ipwho.is/');
-        const loc = await locRes.json();
-        console.log ("Location:", loc);
-
-        if (!loc.success || !loc.latitude || !loc.longitude) {
-          throw new Error('Could not get location.');
-        }
-
-        const weatherRes = await fetch(`/api/weather?lat=${loc.latitude}&lon=${loc.longitude}`);
-        const data = await weatherRes.json();
-
-        if (!data.main || !data.weather) {
-          throw new Error('Invalid weather response.');
-        }
-
-        setWeather({
-          temp: `${Math.round(data.main.temp)}°C`,
-          desc: data.weather[0].description,
-          city: loc.city,
-          country: loc.country,
-        });
-      } catch (err: any) {
-        console.error('Error fetching data:', err);
-        setError('Failed to fetch weather.');
-      } finally {
-        await sdk.actions.ready();
-      }
-    }
-
-    fetchData();
-  }, []);
+export default function WeatherHome() {
+  const router = useRouter();
 
   return (
-    <div style={{
-      height: '100vh', display: 'flex', flexDirection: 'column',
-      justifyContent: 'center', alignItems: 'center',
-      background: 'linear-gradient(to right, #4facfe, #00f2fe)',
-      color: 'white', fontSize: 28, fontWeight: 'bold',
-      textAlign: 'center', padding: 20
+    <div className="weather-app weather-gradient-bg" style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      gap: '2rem',
+      padding: '1rem',
+      textAlign: 'center',
+      boxSizing: 'border-box'
     }}>
-      {error ? (
-        <div>{error}</div>
-      ) : weather ? (
-        <>
-          <div style={{ fontSize: 24, marginBottom: 10 }}>📍 {weather.city}, {weather.country}</div>
-          <div style={{ fontSize: 48 }}>🌤️ {weather.temp}</div>
-          <div style={{ fontSize: 22, marginBottom: 20 }}>{weather.desc}</div>
-          <button
-            style={{
-              padding: '12px 28px',
-              fontSize: 18,
-              background: '#ffffff33',
-              border: 'none',
-              borderRadius: 12,
-              color: 'white',
-              cursor: 'pointer',
-              boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-              transition: 'transform 0.2s ease'
-            }}
-            onClick={() => window.location.reload()}
-            onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.05)')}
-            onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
-          >
-            🔄 Refresh
-          </button>
-        </>
-      ) : (
-        <div>Loading weather…</div>
-      )}
+      <div className="fade-in" style={{ width: '100%', maxWidth: '600px' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 6vw, 2.25rem)', fontWeight: 'bold', marginBottom: '0.5rem' }}>🌦️ Weather Assistant</h1>
+        <p style={{ fontSize: 'clamp(0.875rem, 4vw, 1.125rem)', opacity: 0.8 }}>Get real-time weather updates anywhere</p>
+      </div>
+      
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1rem',
+        width: '100%',
+        maxWidth: '600px'
+      }}>
+        <div
+          onClick={() => router.push('/frames/weather/current')}
+          className="weather-card"
+          style={{
+            padding: '1.5rem',
+            cursor: 'pointer',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div style={{ fontSize: '2.25rem', marginBottom: '0.75rem' }}>📍</div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Current Location</h2>
+          <p style={{ fontSize: '0.875rem', opacity: 0.8, marginBottom: '0.75rem' }}>Get weather based on your current location</p>
+          <div className="tag">Automatic detection</div>
+        </div>
+
+        <div
+          onClick={() => router.push('/frames/weather/search')}
+          className="weather-card"
+          style={{
+            padding: '1.5rem',
+            cursor: 'pointer',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div style={{ fontSize: '2.25rem', marginBottom: '0.75rem' }}>🔍</div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Search City</h2>
+          <p style={{ fontSize: '0.875rem', opacity: 0.8, marginBottom: '0.75rem' }}>Enter a city name to get weather info</p>
+          <div className="tag">Worldwide coverage</div>
+        </div>
+      </div>
+      
+      <div style={{ fontSize: '0.75rem', opacity: 0.6, animation: 'pulse 2s infinite' }}>Select an option to continue</div>
     </div>
   );
 }

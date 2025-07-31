@@ -6,13 +6,18 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const lat = searchParams.get('lat');
   const lon = searchParams.get('lon');
+  const city = searchParams.get('city');
 
-  if (!lat || !lon) {
-    return NextResponse.json({ error: 'Missing lat/lon' }, { status: 400 });
+  let url = '';
+
+  if (lat && lon) {
+    url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+  } else if (city) {
+    url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+  } else {
+    return NextResponse.json({ error: 'Missing location parameters' }, { status: 400 });
   }
-
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
-
+  
   try {
     const res = await fetch(url);
     const data = await res.json();
