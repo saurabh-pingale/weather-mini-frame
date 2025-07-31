@@ -1,10 +1,20 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { sdk } from '@farcaster/miniapp-sdk';
 import '@/app/styles/weather.css';
 
 export default function WeatherHome() {
   const router = useRouter();
+
+  async function initialize() {
+    await sdk.actions.ready();
+  }
+  
+  useEffect(() => {
+    initialize();
+  })
 
   return (
     <div className="weather-app weather-gradient-bg" style={{

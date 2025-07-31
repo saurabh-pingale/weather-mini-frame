@@ -116,7 +116,8 @@ export default function WeatherMiniApp() {
         <div className="weather-card fade-in" style={{
           padding: '1.5rem',
           width: '100%',
-          maxWidth: '600px'
+          maxWidth: '600px',
+          marginTop: '2rem'
         }}>
           <div style={{ 
             fontSize: 'clamp(1.75rem, 8vw, 2rem)', 
