@@ -13,9 +13,7 @@ export async function POST(req: Request) {
         inputText: 'Enter city name (e.g. New York)',
         buttons: [{ label: 'Search', action: 'post' }],
         error: 'Please enter a city name'
-      }), {
-        headers: { 'Content-Type': 'text/html' },
-      });
+      }));
     }
 
     const weatherRes = await fetch(`https://weather-mini-frame-ten.vercel.app/api/weather?city=${encodeURIComponent(inputText)}`);
@@ -28,9 +26,7 @@ export async function POST(req: Request) {
         inputText: 'Enter city name (e.g. New York)',
         buttons: [{ label: 'Try Again', action: 'post' }],
         error: weatherData.message || 'City not found'
-      }), {
-        headers: { 'Content-Type': 'text/html' },
-      });
+      }));
     }
 
     const weatherImageUrl = await generateWeatherImage(weatherData);
@@ -42,9 +38,7 @@ export async function POST(req: Request) {
         { label: 'Current Weather', action: 'post' },
         { label: 'Search Again', action: 'post' }
       ]
-    }), {
-      headers: { 'Content-Type': 'text/html' },
-    });
+    }));
 
   } catch (error: any) {
     return new NextResponse(getFrameHtml({
@@ -53,9 +47,7 @@ export async function POST(req: Request) {
       inputText: 'Enter city name (e.g. New York)',
       buttons: [{ label: 'Try Again', action: 'post' }],
       error: error.message || 'Failed to fetch weather'
-    }), {
-      headers: { 'Content-Type': 'text/html' },
-    });
+    }));
   }
 }
 

@@ -3,65 +3,70 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const locRes = await fetch('https://ipwho.is/');
-    const loc = await locRes.json();
+    const data = await req.json();
+    const baseUrl = new URL(req.url).origin;
+    
+    const userLocation = data.untrustedData?.addresses?.[0] || 
+                        data.untrustedData?.location;
 
-    if (!loc.success) {
-      return new NextResponse(getFrameHtml({
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Location+not+found&icon=⚠️',
-        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
-        buttons: [
-          { label: 'Try Again', action: 'post' },
-          { label: 'Search City', action: 'post' }
-        ],
-        error: 'Could not detect location'
-      }), {
-        headers: { 'Content-Type': 'text/html' },
-      });
+    let lat, lon;
+    if (userLocation) {
+      lat = userLocation.lat;
+      lon = userLocation.lon;
+    } else {
+      const locRes = await fetch('https://ipwho.is/');
+      const loc = await locRes.json();
+      if (!loc.success) {
+        return new NextResponse(getFrameHtml({
+          imageUrl: `https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Location+not+found&icon=⚠️`,
+          postUrl: `https://weather-mini-frame-ten.vercel.app/api/frame`,
+          buttons: [
+            { label: 'Try Again', action: 'post' },
+            { label: 'Search City', action: 'post' }
+          ],
+          error: 'Could not detect location'
+        }));
+      }
+      lat = loc.latitude;
+      lon = loc.longitude;
     }
 
-    const weatherRes = await fetch(`https://weather-mini-frame-ten.vercel.app/api/weather?lat=${loc.latitude}&lon=${loc.longitude}`);
+    const weatherRes = await fetch(`https://weather-mini-frame-ten.vercel.app/api/weather?lat=${lat}&lon=${lon}`);
     const weatherData = await weatherRes.json();
 
     if (weatherData.cod !== 200) {
       return new NextResponse(getFrameHtml({
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Weather+unavailable&icon=⚠️',
-        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
+        imageUrl: `https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Weather+unavailable&icon=⚠️`,
+        postUrl: `https://weather-mini-frame-ten.vercel.app/api/frame`,
         buttons: [
           { label: 'Try Again', action: 'post' },
           { label: 'Search City', action: 'post' }
         ],
         error: 'Weather data unavailable'
-      }), {
-        headers: { 'Content-Type': 'text/html' },
-      });
+      }));
     }
 
     const weatherImageUrl = await generateWeatherImage(weatherData);
     
     return new NextResponse(getFrameHtml({
       imageUrl: weatherImageUrl,
-      postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
+      postUrl: `https://weather-mini-frame-ten.vercel.app/api/frame/current`,
       buttons: [
         { label: 'Refresh', action: 'post' },
         { label: 'Search City', action: 'post' }
       ]
-    }), {
-      headers: { 'Content-Type': 'text/html' },
-    });
+    }));
 
   } catch (error: any) {
     return new NextResponse(getFrameHtml({
-      imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Server+error&icon=⚠️',
-      postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
+      imageUrl: `${new URL(req.url).origin}/api/og?city=Error&country=--&temp=--°C&desc=Server+error&icon=⚠️`,
+      postUrl: `${new URL(req.url).origin}/api/frame`,
       buttons: [
         { label: 'Try Again', action: 'post' },
         { label: 'Search City', action: 'post' }
       ],
       error: error.message || 'Failed to fetch weather'
-    }), {
-      headers: { 'Content-Type': 'text/html' },
-    });
+    }));
   }
 }
 

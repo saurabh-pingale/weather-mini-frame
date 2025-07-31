@@ -5,53 +5,26 @@ export async function POST(req: Request) {
     const data = await req.json();
     const buttonIndex = data.untrustedData?.buttonIndex;
     
-    if (!buttonIndex) {
-      return new NextResponse(getFrameHtml({ 
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Invalid+request&icon=⚠️',
-        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
-        buttons: [
-          { label: 'Try Again', action: 'post' }
-        ],
-        error: 'Invalid request'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'text/html' },
-      });
-    }
-
     if (buttonIndex === 1) {
-      return new NextResponse(getFrameHtml({ 
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Weather&country=App&temp=--°C&desc=Select+an+option&icon=🌤️',
-        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/current',
-        buttons: [
-          { label: 'Current Weather', action: 'post' },
-          { label: 'Search City', action: 'post' }
-        ]
-      }), {
-        headers: { 'Content-Type': 'text/html' },
-      });
-    } else if (buttonIndex === 2) {
+      return NextResponse.redirect(new URL('/api/frame/current', req.url));
+    } 
+    else if (buttonIndex === 2) {
       return new NextResponse(getFrameHtml({
         imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Search&country=Weather&temp=--°C&desc=Enter+city+name&icon=🔍',
         postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/search',
         inputText: 'Enter city name',
         buttons: [{ label: 'Search', action: 'post' }]
-      }), {
-        headers: { 'Content-Type': 'text/html' },
-      });
+      }));
     }
-
+    
     return new NextResponse(getFrameHtml({ 
       imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Invalid+action&icon=⚠️',
       postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
       buttons: [
-        { label: 'Try Again', action: 'post' }
-      ],
-      error: 'Invalid action'
-    }), {
-      status: 400,
-      headers: { 'Content-Type': 'text/html' },
-    });
+        { label: 'Current Weather', action: 'post' },
+        { label: 'Search City', action: 'post' }
+      ]
+    }));
   } catch (error) {
     return new NextResponse(getFrameHtml({ 
       imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Server+error&icon=⚠️',
