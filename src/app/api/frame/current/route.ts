@@ -7,14 +7,34 @@ export async function POST(req: Request) {
     const loc = await locRes.json();
 
     if (!loc.success) {
-      throw new Error('Could not detect location');
+      return new NextResponse(getFrameHtml({
+        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Location+not+found&icon=⚠️',
+        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
+        buttons: [
+          { label: 'Try Again', action: 'post' },
+          { label: 'Search City', action: 'post' }
+        ],
+        error: 'Could not detect location'
+      }), {
+        headers: { 'Content-Type': 'text/html' },
+      });
     }
 
     const weatherRes = await fetch(`https://weather-mini-frame-ten.vercel.app/api/weather?lat=${loc.latitude}&lon=${loc.longitude}`);
     const weatherData = await weatherRes.json();
 
     if (weatherData.cod !== 200) {
-      throw new Error('Weather data unavailable');
+      return new NextResponse(getFrameHtml({
+        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Weather+unavailable&icon=⚠️',
+        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
+        buttons: [
+          { label: 'Try Again', action: 'post' },
+          { label: 'Search City', action: 'post' }
+        ],
+        error: 'Weather data unavailable'
+      }), {
+        headers: { 'Content-Type': 'text/html' },
+      });
     }
 
     const weatherImageUrl = await generateWeatherImage(weatherData);
@@ -23,7 +43,7 @@ export async function POST(req: Request) {
       imageUrl: weatherImageUrl,
       postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
       buttons: [
-        { label: 'Current Weather', action: 'post' },
+        { label: 'Refresh', action: 'post' },
         { label: 'Search City', action: 'post' }
       ]
     }), {
@@ -32,7 +52,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     return new NextResponse(getFrameHtml({
-      imageUrl: 'https://weather-mini-frame-ten.vercel.app/error-image.png',
+      imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Server+error&icon=⚠️',
       postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
       buttons: [
         { label: 'Try Again', action: 'post' },

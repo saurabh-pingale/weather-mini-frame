@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     
     if (!buttonIndex) {
       return new NextResponse(getFrameHtml({ 
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/error-image.png',
+        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Invalid+request&icon=⚠️',
         postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
         buttons: [
           { label: 'Try Again', action: 'post' }
@@ -21,8 +21,8 @@ export async function POST(req: Request) {
 
     if (buttonIndex === 1) {
       return new NextResponse(getFrameHtml({ 
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/og-image.png',
-        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
+        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Weather&country=App&temp=--°C&desc=Select+an+option&icon=🌤️',
+        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/current',
         buttons: [
           { label: 'Current Weather', action: 'post' },
           { label: 'Search City', action: 'post' }
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       });
     } else if (buttonIndex === 2) {
       return new NextResponse(getFrameHtml({
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/search-image.png',
+        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Search&country=Weather&temp=--°C&desc=Enter+city+name&icon=🔍',
         postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/search',
         inputText: 'Enter city name',
         buttons: [{ label: 'Search', action: 'post' }]
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     }
 
     return new NextResponse(getFrameHtml({ 
-      imageUrl: 'https://weather-mini-frame-ten.vercel.app/error-image.png',
+      imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Invalid+action&icon=⚠️',
       postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
       buttons: [
         { label: 'Try Again', action: 'post' }
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     return new NextResponse(getFrameHtml({ 
-      imageUrl: 'https://weather-mini-frame-ten.vercel.app/error-image.png',
+      imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Server+error&icon=⚠️',
       postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
       buttons: [
         { label: 'Try Again', action: 'post' }

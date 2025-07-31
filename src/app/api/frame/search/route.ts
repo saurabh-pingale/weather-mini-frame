@@ -5,11 +5,10 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
     const inputText = data.untrustedData?.inputText;
-    const buttonIndex = data.untrustedData?.buttonIndex;
     
     if (!inputText) {
       return new NextResponse(getFrameHtml({
-        imageUrl: 'https://weather-mini-frame-ten.vercel.app/search-image.png',
+        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Search&country=Weather&temp=--°C&desc=Enter+city+name&icon=🔍',
         postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/search',
         inputText: 'Enter city name (e.g. New York)',
         buttons: [{ label: 'Search', action: 'post' }],
@@ -23,7 +22,15 @@ export async function POST(req: Request) {
     const weatherData = await weatherRes.json();
 
     if (weatherData.cod !== 200) {
-      throw new Error(weatherData.message || 'City not found');
+      return new NextResponse(getFrameHtml({
+        imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=City+not+found&icon=⚠️',
+        postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/search',
+        inputText: 'Enter city name (e.g. New York)',
+        buttons: [{ label: 'Try Again', action: 'post' }],
+        error: weatherData.message || 'City not found'
+      }), {
+        headers: { 'Content-Type': 'text/html' },
+      });
     }
 
     const weatherImageUrl = await generateWeatherImage(weatherData);
@@ -33,7 +40,7 @@ export async function POST(req: Request) {
       postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame',
       buttons: [
         { label: 'Current Weather', action: 'post' },
-        { label: 'Search City', action: 'post' }
+        { label: 'Search Again', action: 'post' }
       ]
     }), {
       headers: { 'Content-Type': 'text/html' },
@@ -41,7 +48,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     return new NextResponse(getFrameHtml({
-      imageUrl: 'https://weather-mini-frame-ten.vercel.app/search-image.png',
+      imageUrl: 'https://weather-mini-frame-ten.vercel.app/api/og?city=Error&country=--&temp=--°C&desc=Search+failed&icon=⚠️',
       postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/search',
       inputText: 'Enter city name (e.g. New York)',
       buttons: [{ label: 'Try Again', action: 'post' }],
