@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    // Get approximate location from IP
     const locRes = await fetch('https://ipwho.is/');
     const loc = await locRes.json();
 
@@ -11,7 +10,6 @@ export async function POST(req: Request) {
       throw new Error('Could not detect location');
     }
 
-    // Fetch weather for current location
     const weatherRes = await fetch(`https://weather-mini-frame-ten.vercel.app/api/weather?lat=${loc.latitude}&lon=${loc.longitude}`);
     const weatherData = await weatherRes.json();
 
@@ -19,7 +17,6 @@ export async function POST(req: Request) {
       throw new Error('Weather data unavailable');
     }
 
-    // Generate weather image
     const weatherImageUrl = await generateWeatherImage(weatherData);
     
     return new NextResponse(getFrameHtml({
@@ -48,7 +45,6 @@ export async function POST(req: Request) {
   }
 }
 
-// Reuse the same generateWeatherImage and getFrameHtml functions
 async function generateWeatherImage(weatherData: any): Promise<string> {
   const params = new URLSearchParams({
     city: weatherData.name,

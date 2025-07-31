@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const buttonIndex = data.untrustedData?.buttonIndex;
     
     if (!inputText) {
-      // Show search input again if no city provided
       return new NextResponse(getFrameHtml({
         imageUrl: 'https://weather-mini-frame-ten.vercel.app/search-image.png',
         postUrl: 'https://weather-mini-frame-ten.vercel.app/api/frame/search',
@@ -20,7 +19,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Fetch weather for the city
     const weatherRes = await fetch(`https://weather-mini-frame-ten.vercel.app/api/weather?city=${encodeURIComponent(inputText)}`);
     const weatherData = await weatherRes.json();
 
@@ -28,7 +26,6 @@ export async function POST(req: Request) {
       throw new Error(weatherData.message || 'City not found');
     }
 
-    // Generate weather image with the data
     const weatherImageUrl = await generateWeatherImage(weatherData);
     
     return new NextResponse(getFrameHtml({
@@ -69,7 +66,7 @@ async function generateWeatherImage(weatherData: any): Promise<string> {
 
   return `https://weather-mini-frame-ten.vercel.app/api/og?${params.toString()}`;
 }
-// Reuse your getFrameHtml function from frame/route.ts
+
 function getFrameHtml(options: {
   imageUrl: string;
   postUrl: string;

@@ -1,4 +1,3 @@
-// src/app/api/og/route.ts
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import React from 'react';
@@ -31,7 +30,6 @@ export async function GET(request: NextRequest) {
       wind: searchParams.get('wind')
     };
 
-    // Fallback values
     const city = params.city || 'Unknown Location';
     const country = params.country || '';
     const temp = params.temp || '--°C';
@@ -41,7 +39,6 @@ export async function GET(request: NextRequest) {
     const humidity = params.humidity || '--%';
     const wind = params.wind || '-- km/h';
 
-    // Define styles outside the JSX to avoid TypeScript errors
     const containerStyle: React.CSSProperties = {
       display: 'flex',
       flexDirection: 'column',
