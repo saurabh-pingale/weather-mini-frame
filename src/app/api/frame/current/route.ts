@@ -4,7 +4,10 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const baseUrl = new URL(req.url).origin;
+
+    if (data.untrustedData?.buttonIndex === 2) {
+      return NextResponse.redirect(`https://weather-mini-frame-ten.vercel.app/api/frame/search`);
+    }
     
     const userLocation = data.untrustedData?.addresses?.[0] || 
                         data.untrustedData?.location;
